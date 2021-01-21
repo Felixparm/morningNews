@@ -40,6 +40,7 @@ router.post('/sign-up', async function(req,res,next){
       password: SHA256(req.body.passwordFromFront+salt).toString(encBase64),
       token: uid2(32),
       salt: salt,
+      // wishlist: []
     })
   
     saveUser = await newUser.save()
@@ -71,7 +72,7 @@ router.post('/sign-in', async function(req,res,next){
   if(error.length == 0){
     const user = await userModel.findOne({
       email: req.body.emailFromFront,
-    })
+    }) 
   
     
     if(user){
@@ -80,20 +81,74 @@ router.post('/sign-in', async function(req,res,next){
       if(passwordEncrypt == user.password){
         result = true
         token = user.token
+        res.json({result, user, error, token})
+
       } else {
         result = false
         error.push('mot de passe incorrect')
+        res.json({result, user, error, token})
       }
       
     } else {
       error.push('email incorrect')
-    }
-  }
+      res.json({result, user, error, token})
+    }}
+  })
   
+  router.post('/wishlist', async function(req, res, next) {
 
-  res.json({result, user, error, token})
+    console.log('routewishlist')
+    
+    const userFind = await userModel.findOne({
 
+      token: req.body.tokenFromFront
 
-})
+    })
+
+    if(userFind){
+      userFind.wishlist.push({
+
+      title:req.body.titleFromFront,
+      description:req.body.descriptionFromFront,
+      content:req.body.contentFromFront,
+      urlToImage:req.body.urlFromFront
+
+      })
+     const userFindSave= await userFind.save() 
+
+    }
+    
+  
+    var result = false
+    if(userFind){
+      result = true
+      console.log(userFind.wishlist);
+    }
+  
+    res.json({result,userFind})
+  });
+
+  router.post('/wishlistdelete', async function(req, res, next) {
+
+    const userFind = await userModel.findOne({
+
+      token: req.body.tokenFromFront
+
+    })
+    let check =false;
+    console.log('fonction delete from back')
+    console.log(req.body)
+   if(userFind){
+     for (var i=0; i<userFind.wishlist.length; i++)
+     {
+         if(userFind.wishlist[i].title==req.body.titleFromFront)
+         {userFind.wishlist.splice(i,1); check=true}
+     }
+   }
+
+   const userFindSave= await userFind.save() 
+   console.log(check);
+    res.json({check})
+  });
 
 module.exports = router;

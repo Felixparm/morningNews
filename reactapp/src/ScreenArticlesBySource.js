@@ -3,20 +3,23 @@ import './App.css';
 import { Card, Icon, Modal} from 'antd';
 import Nav from './Nav'
 import {connect} from 'react-redux'
+import { useParams } from "react-router";
 
 const { Meta } = Card;
 
 function ScreenArticlesBySource(props) {
+
 
   const [articleList, setArticleList] = useState([])
 
   const [visible, setVisible] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-
+  console.log(useParams())
+  var id=useParams();
   useEffect(() => {
     const findArticles = async() => {
-      const data = await fetch(`https://newsapi.org/v2/top-headlines?sources=${props.match.params.id}&apiKey=189771adbd2f40d4a27117edd90ff089`)
+      const data = await fetch(`https://newsapi.org/v2/top-headlines?sources=${id.id}&apiKey=189771adbd2f40d4a27117edd90ff089`)
       const body = await data.json()
       console.log(body)
       setArticleList(body.articles) 
@@ -24,11 +27,27 @@ function ScreenArticlesBySource(props) {
 
     findArticles()    
   },[])
+var addArticletoBDD = async function (token,article)  { 
+    const data = await fetch('/wishlist',{ 
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: `tokenFromFront=${token}&titleFromFront=${article.title}&descriptionFromFront=${article.description}&contentFromFront=${article.content}&urlFromFront=${article.urlToImage}`
+  }
+  ) 
+props.addToWishList(article);
+}
 
-  var showModal = (title, content) => {
+  
+  
+ 
+
+
+
+
+  var showModal = (title, desc) => {
     setVisible(true)
     setTitle(title)
-    setContent(content)
+    setContent(desc)
 
   }
 
@@ -68,8 +87,10 @@ function ScreenArticlesBySource(props) {
                   />
                   }
                   actions={[
-                      <Icon type="read" key="ellipsis2" onClick={() => showModal(article.title,article.content)} />,
-                      <Icon type="like" key="ellipsis" onClick={()=> {props.addToWishList(article)}} />
+                      <Icon type="read" key="ellipsis2" onClick={() => showModal(article.title,article.description)} />,
+                      <Icon type="like" key="ellipsis" onClick={()=> addArticletoBDD(props.token,article)} />
+                    
+                      
                   ]}
                   >
 
@@ -91,11 +112,6 @@ function ScreenArticlesBySource(props) {
               </div>
 
               ))}
-              
-
-
-            
-
            </div> 
 
          
@@ -114,7 +130,16 @@ function mapDispatchToProps(dispatch){
   }
 }
 
+function mapStateToProps(state){
+  return {token: state.token}
+}
+
+
+
+
 export default connect(
-  null,
+
+  mapStateToProps,
   mapDispatchToProps
+  
 )(ScreenArticlesBySource)

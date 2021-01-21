@@ -13,6 +13,7 @@ export default function(wishList = [], action){
 
         if(!findArticle){
             wishListCopy.push(action.articleLiked)
+            console.log('wishListFromReduce',wishListCopy)
         }
         
         return wishListCopy
@@ -31,7 +32,14 @@ export default function(wishList = [], action){
 
         return wishListCopy
         
-    } else {
+    } 
+    else if (action.type=='init'){
+        var wishListCopy = action.wishlist
+        console.log('valeur à l initialisation de wishlist',action.wishlist)
+        return wishListCopy
+    }
+    else 
+    {
         return wishList
     }
 }

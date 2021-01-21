@@ -24,7 +24,7 @@ function App() {
         <Switch>
           <Route component={ScreenHome} path="/" exact />
           <Route component={ScreenSource} path="/screensource" exact />
-          <Route component={ScreenArticlesBySource} path="/screenarticlesbysource/:id" exact />
+          <Route component={ScreenArticlesBySource} path="/screenarticlesbysource/:id" />
           <Route component={ScreenMyArticles} path="/screenmyarticles" exact />
         </Switch>
       </Router>

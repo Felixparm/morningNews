@@ -30,6 +30,8 @@ function ScreenHome(props) {
 
     if(body.result == true){
       props.addToken(body.token)
+      props.initWishList(body.saveUser.wishlist)
+      console.log(body.saveUser.wishlist)
       setUserExists(true)
       
     } else {
@@ -48,7 +50,10 @@ function ScreenHome(props) {
     const body = await data.json()
 
     if(body.result == true){
+
       props.addToken(body.token)
+      props.initWishList(body.user.wishlist)
+      console.log(body.user.wishlist)
       setUserExists(true)
       
     }  else {
@@ -111,9 +116,15 @@ function mapDispatchToProps(dispatch){
   return {
     addToken: function(token){
       dispatch({type: 'addToken', token: token})
+    },
+    initWishList: function (wishlist){
+      dispatch ({type: 'init', wishlist})
     }
-  }
+    }
 }
+
+
+
 
 export default connect(
   null,
